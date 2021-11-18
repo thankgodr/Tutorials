@@ -2,53 +2,72 @@ package com.richard.jetpacklessons
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 
 /**
  * This activity allows the user to roll a dice and view the result
  * on the screen.
  */
 class MainActivity : AppCompatActivity() {
+    private lateinit var imageState : ImageView
+    private var state = LemonadeState.SELECT
+    private var squeezeCount = 4
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val rollBtb = findViewById<Button>(R.id.rollBtn)
-        rollBtb.setOnClickListener{ rollDice() }
+        //Find Image on the screen
+        imageState = findViewById(R.id.image_lemon_state)
 
-        // Do a dice roll when the app starts
-        rollDice()
+        //Set Default image when app start
+        imageState.setImageResource(R.drawable.lemon_tree)
+        imageState.setOnClickListener{ clickLemonImage() }
     }
 
-    /**
-     * Roll the dice and update the screen with the result.
-     */
-    private fun rollDice() {
-        // Create new Dice object with 6 sides and roll it
-        val dice = Dice(6)
-        val diceRoll = dice.roll()
-
-        // Find the ImageView in the layout
-        val diceImageiew: ImageView = findViewById(R.id.diceImage)
-
-        // Determine which drawable resource ID to use based on the dice roll
-        val drawableResource = when (diceRoll) {
-            1 -> R.drawable.dice_1
-            2 -> R.drawable.dice_2
-            3 -> R.drawable.dice_3
-            4 -> R.drawable.dice_4
-            5 -> R.drawable.dice_5
-            else -> R.drawable.dice_6
+    private fun clickLemonImage() {
+        val drawableId : Int
+        when(state){
+            LemonadeState.SELECT ->  {
+                state = LemonadeState.SQUEEZE
+                drawableId = R.drawable.lemon_squeeze
+            }
+            LemonadeState.DRINK -> {
+                state = LemonadeState.RESTART
+                drawableId = R.drawable.lemon_restart
+            }
+            LemonadeState.SQUEEZE -> {
+               if(squeezeCount == 0){
+                   state = LemonadeState.DRINK
+                   drawableId = R.drawable.lemon_drink
+               }else{
+                   squeezeCount -= 1
+                   state = LemonadeState.SQUEEZE
+                   drawableId = R.drawable.lemon_squeeze
+               }
+            }
+            LemonadeState.RESTART -> {
+                state = LemonadeState.SELECT
+                drawableId = R.drawable.lemon_tree
+                squeezeCount = 4
+            }
         }
-
-        // Update the ImageView with the correct drawable resource ID
-        diceImageiew.setImageResource(drawableResource)
-
-        // Update the content description
-        diceImageiew.contentDescription = diceRoll.toString()
+        imageState.setImageResource(drawableId)
+        setViewElements()
 
     }
+
+    private fun setViewElements() {
+        val textAction : TextView = findViewById(R.id.text_action)
+        val stateString = when(state){
+            LemonadeState.SELECT ->  R.string.lemon_select
+            LemonadeState.DRINK ->  R.string.lemon_drink
+            LemonadeState.SQUEEZE -> R.string.lemon_squeeze
+            LemonadeState.RESTART -> R.string.lemon_empty_glass
+        }
+        textAction.text = getString(stateString)
+    }
+
+
 }
