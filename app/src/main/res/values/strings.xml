@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">jetpacklessons</string>
+    <string name="happy_birthday">Happy Birthday</string>
+    <string name="from_richard">From Richard</string>
+    <string name="roll">Roll</string>
+    <string name="zero">0</string>
+    <string name="dice_image">dice image</string>
+</resources>
